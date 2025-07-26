@@ -8,6 +8,8 @@
 #include <unistd.h>
 
 #define PORT 6767
+#define MAX_CLIENTS 10
+#define MIN_CLIENTS 3
 
 int main() {
     int s, c;
@@ -15,6 +17,13 @@ int main() {
     socklen_t addrlen = sizeof(client);
     char buf[512];
     int bytes;
+    int client_sockets[MAX_CLIENTS];
+    int num_clients = 0;
+
+    // Initialize client sockets
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        client_sockets[i] = -1; // -1 indicates an unused slot
+    }
 
     //create socket 
     s = socket(AF_INET, SOCK_STREAM, 0);
@@ -31,7 +40,7 @@ int main() {
 
     //makes sure port is open
     int opt = 1;
-    setsocketopt(s, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+    setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
     //binds socket 
     if (bind(s, (struct sockaddr *)&sock, sizeof(sock))) {
@@ -45,6 +54,9 @@ int main() {
 	close(s);
 	return 3;
     }
+
+    printf("2PC coordinator listening on: %s:%d\n", inet_ntoa(sock.sin_addr), PORT);
+    printf("Waiting for participants to connect...\n");
 }
 
 
