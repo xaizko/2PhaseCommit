@@ -26,7 +26,7 @@ int main() {
 
     //fill out socket 
     sock.sin_family = AF_INET;
-    sock.sin_addr.s_adrr = INADDR_ANY; // local host
+    sock.sin_addr.s_addr = INADDR_ANY; // local host
     sock.sin_port = htons(PORT);
 
     //makes sure port is open
