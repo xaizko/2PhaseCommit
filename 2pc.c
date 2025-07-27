@@ -68,10 +68,10 @@ int main() {
 
 	client_sockets[client_count] = c;
 	client_count++;
-	printf("Client %d connected from %s\n", client_count, inet_nota(client.sin_addr));
+	printf("Client %d connected from %s\n", client_count, inet_ntoa(client.sin_addr));
     }
 
-    printf("Minimum clients connected. Starting 2PC protocol");
+    printf("Minimum clients connected. Starting 2PC protocol\n");
 
     //Prepare phase
     char *message = "Prepare";
