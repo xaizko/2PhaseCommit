@@ -18,7 +18,7 @@ int main() {
     char buf[512];
     int bytes;
     int client_sockets[MAX_CLIENTS];
-    int num_clients = 0;
+    int client_count = 0;
 
     // Initialize client sockets
     for (int i = 0; i < MAX_CLIENTS; i++) {
@@ -57,6 +57,34 @@ int main() {
 
     printf("2PC coordinator listening on: %s:%d\n", inet_ntoa(sock.sin_addr), PORT);
     printf("Waiting for participants to connect...\n");
+
+    //accept connections
+    while (client_count < MIN_CLIENTS) {
+	c = accept(s, (struct sockaddr *)&client, &addrlen);
+	if (c < 0) {
+	    fprintf(stderr, "Failed to accept incoming client\n");
+	    continue;
+	}
+
+	client_sockets[client_count] = c;
+	client_count++;
+	printf("Client %d connected from %s\n", client_count, inet_nota(client.sin_addr));
+    }
+
+    printf("Minimum clients connected. Starting 2PC protocol");
+
+    char *message = "Prepare";
+    for (int i = 0; i < client_count; i++) {
+	send(client_sockets[i], message, strlen(message), 0);
+    } 
+
+    //clean up 
+    for (int i = 0; i < client_count; i++) {
+	close(client_sockets[i]);
+    }
+    close(s);
+    
+    return 0;
 }
 
 
