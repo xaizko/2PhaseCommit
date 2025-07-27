@@ -73,6 +73,7 @@ int main() {
 
     printf("Minimum clients connected. Starting 2PC protocol");
 
+    //Prepare phase
     char *message = "Prepare";
     for (int i = 0; i < client_count; i++) {
 	send(client_sockets[i], message, strlen(message), 0);
