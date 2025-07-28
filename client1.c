@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <time.h>
 
 #define IP "127.0.0.1"
 #define PORT 6767
@@ -40,11 +41,23 @@ int main() {
     if (bytes > 0) {
 	buf[bytes] = '\0';
 	printf("Received from coordinator: %s\n", buf);
+
+	srand(time(NULL)); 
+	int commit = rand() % 10;
+	char *message;
+	if (commit == 0) {
+	    message = "ABORT";
+	} else {
+	    message = "COMMIT";
+	}
+	send(s, message, strlen(message), 0);
     } else if (bytes == 0) {
 	printf("Coordinator closed connection\n");
     } else {
 	fprintf(stderr, "Error receiving data\n");
     } 
+
+    sleep(2);
 
     printf("Closing connection\n");
     close(s);

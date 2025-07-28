@@ -16,7 +16,6 @@ int main() {
     struct sockaddr_in sock, client;
     socklen_t addrlen = sizeof(client);
     char buf[512];
-    int bytes;
     int client_sockets[MAX_CLIENTS];
     int client_count = 0;
 
@@ -78,6 +77,34 @@ int main() {
     for (int i = 0; i < client_count; i++) {
 	send(client_sockets[i], message, strlen(message), 0);
     } 
+
+    //wait for commit
+    int bytes;
+    int commit_count = 0;
+    int abort_count = 0;
+
+    for (int i = 0; i < client_count; i++) {
+	memset(buf, 0, sizeof(buf));
+	bytes = recv(client_sockets[i], buf, sizeof(buf) - 1, 0);
+	if (bytes > 0) {
+	    buf[bytes] = '\0';
+	    printf("receieved: %s\n", buf);
+	    if (!strcmp(buf, "COMMIT")) {
+		commit_count++;
+	    } else if (!strcmp(buf, "ABORT")) {
+		abort_count++;
+	    }
+	} else {
+	    printf("No response from client %d\n", i);
+	    abort_count++;
+	}
+    }
+
+    if (commit_count == client_count) {
+	printf("Received all commits\n");
+    } else {
+	printf("Aborting, not enough confirmations\n");
+    }
 
     //clean up 
     for (int i = 0; i < client_count; i++) {
